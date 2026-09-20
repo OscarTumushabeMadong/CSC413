@@ -2,6 +2,8 @@ package edu.sfsu.csc413.chess.model;
 
 public record Position(int file, int rank) {
 
+    public static final int BOARD_SIZE = 8;
+
     public Position {
         if (file < 0 || file > 7 || rank < 0 || rank > 7) {
             throw new IllegalArgumentException("Position must be on the board");
