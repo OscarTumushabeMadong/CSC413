@@ -2,6 +2,8 @@ package edu.sfsu.csc413.chess.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The pawn — the piece that breaks every rule the others follow.
@@ -23,6 +25,22 @@ public class Pawn extends Piece {
     /**
      * What a pawn may become on reaching the far rank.
      */
+    private void addPawnMove(
+            List<Move> moves,
+            Position from,
+            Position to,
+            Piece captured) {
+
+        if (to.rank() == color().promotionRank()) {
+            for (PieceType promotion : PROMOTION_CHOICES) {
+                moves.add(Move.promotion(from, to, this, captured, promotion));
+            }
+        } else if (captured == null) {
+            moves.add(Move.quiet(from, to, this));
+        } else {
+            moves.add(Move.capture(from, to, this, captured));
+        }
+    }
     private static final PieceType[] PROMOTION_CHOICES = { PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT };
 
     public Pawn(Color color) {
@@ -31,7 +49,39 @@ public class Pawn extends Piece {
 
     @Override
     public List<Move> pseudoLegalMoves(Board board, Position from) {
-        throw new UnsupportedOperationException("M2: implement Pawn.pseudoLegalMoves");
+        List<Move> moves = new ArrayList<>();
+
+        int direction = color().pawnDirection();
+
+        Position oneForward = from.offsetOrNull(0, direction);
+
+        if (oneForward != null && board.pieceAt(oneForward) == null) {
+            addPawnMove(moves, from, oneForward, null);
+
+            if (from.rank() == color().pawnStartRank()) {
+                Position twoForward = from.offsetOrNull(0, 2 * direction);
+
+                if (twoForward != null && board.pieceAt(twoForward) == null) {
+                    moves.add(Move.quiet(from, twoForward, this));
+                }
+            }
+        }
+
+        for (int fileDelta : new int[]{-1, 1}) {
+            Position captureSquare = from.offsetOrNull(fileDelta, direction);
+
+            if (captureSquare == null) {
+                continue;
+            }
+
+            Piece captured = board.pieceAt(captureSquare);
+
+            if (captured != null && captured.color() != color()) {
+                addPawnMove(moves, from, captureSquare, captured);
+            }
+        }
+
+        return moves;
     }
 
     /**
@@ -47,6 +97,11 @@ public class Pawn extends Piece {
      */
     @Override
     public boolean attacks(Board board, Position from, Position target) {
-        throw new UnsupportedOperationException("M2: implement Pawn.attacks");
+        int direction = color().pawnDirection();
+
+        Position leftAttack = from.offsetOrNull(-1, direction);
+        Position rightAttack = from.offsetOrNull(1, direction);
+
+        return target.equals(leftAttack) || target.equals(rightAttack);
     }
 }
