@@ -1,5 +1,7 @@
 package edu.sfsu.csc413.chess.engine;
 
+import edu.sfsu.csc413.chess.model.Position;
+
 import edu.sfsu.csc413.chess.factory.BoardFactory;
 import edu.sfsu.csc413.chess.model.Board;
 import edu.sfsu.csc413.chess.model.Color;
@@ -45,11 +47,11 @@ public class Game {
     }
 
     public Board board() {
-        throw new UnsupportedOperationException("M3: implement Game.board");
+        return board;
     }
 
     public Color sideToMove() {
-        throw new UnsupportedOperationException("M3: implement Game.sideToMove");
+        return sideToMove;
     }
 
     /**
@@ -59,7 +61,7 @@ public class Game {
      * out would let any caller rewrite the game's past.
      */
     public List<Move> history() {
-        throw new UnsupportedOperationException("M3: implement Game.history");
+        return List.copyOf(history);
     }
 
     /**
@@ -71,7 +73,15 @@ public class Game {
      * or its callers.
      */
     public List<Move> legalMoves() {
-        throw new UnsupportedOperationException("M3: implement Game.legalMoves");
+        List<Move> moves = new ArrayList<>();
+
+        for (Position from : board.positionsOf(sideToMove)) {
+            moves.addAll(
+                    board.pieceAt(from).pseudoLegalMoves(board, from)
+            );
+        }
+
+        return moves;
     }
 
     /**
@@ -84,7 +94,13 @@ public class Game {
      * with that case.
      */
     public Optional<Move> findLegalMove(String notation) {
-        throw new UnsupportedOperationException("M3: implement Game.findLegalMove");
+        for (Move move : legalMoves()) {
+            if (move.toString().equalsIgnoreCase(notation)) {
+                return Optional.of(move);
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -95,7 +111,13 @@ public class Game {
      *         {@link #legalMoves()}
      */
     public void play(Move move) {
-        throw new UnsupportedOperationException("M3: implement Game.play");
+        if (!legalMoves().contains(move)) {
+            throw new IllegalArgumentException("Illegal move: " + move);
+        }
+
+        board.apply(move);
+        history.add(move);
+        sideToMove = sideToMove.opposite();
     }
 
     /**
@@ -105,6 +127,14 @@ public class Game {
      * was captured. In Week 10 this becomes the Command pattern proper.
      */
     public Optional<Move> undoLastMove() {
-        throw new UnsupportedOperationException("M3: implement Game.undoLastMove");
+        if (history.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Move last = history.remove(history.size() - 1);
+        board.undo(last);
+        sideToMove = sideToMove.opposite();
+
+        return Optional.of(last);
     }
 }

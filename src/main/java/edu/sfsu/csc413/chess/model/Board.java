@@ -73,4 +73,26 @@ public class Board {
 
         return fen.toString();
     }
+    public void apply(Move move) {
+        place(move.from(), null);
+
+        if (move.isPromotion()) {
+            Piece promotedPiece = switch (move.promotesTo()) {
+                case QUEEN -> new Queen(move.moved().color());
+                case ROOK -> new Rook(move.moved().color());
+                case BISHOP -> new Bishop(move.moved().color());
+                case KNIGHT -> new Knight(move.moved().color());
+                default -> throw new IllegalArgumentException(
+                        "Invalid promotion type: " + move.promotesTo());
+            };
+
+            place(move.to(), promotedPiece);
+        } else {
+            place(move.to(), move.moved());
+        }
+    }
+    public void undo(Move move) {
+        place(move.from(), move.moved());
+        place(move.to(), move.captured());
+    }
 }

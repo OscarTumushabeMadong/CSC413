@@ -30,7 +30,7 @@ public record Move(Position from, Position to, Piece moved, Piece captured, Piec
     }
 
     /**
-     * A move that removes an enemy piece from the destination square.
+     * A move that removes an enemy piece from the destination square.j
      */
     public static Move capture(Position from, Position to, Piece moved, Piece captured) {
         return new Move(from, to, moved, captured, null);
