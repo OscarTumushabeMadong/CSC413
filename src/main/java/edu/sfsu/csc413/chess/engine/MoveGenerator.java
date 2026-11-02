@@ -1,11 +1,8 @@
 package edu.sfsu.csc413.chess.engine;
 
 import java.util.ArrayList;
-import edu.sfsu.csc413.chess.model.Position;
 
-import edu.sfsu.csc413.chess.model.Board;
-import edu.sfsu.csc413.chess.model.Color;
-import edu.sfsu.csc413.chess.model.Move;
+import edu.sfsu.csc413.chess.model.*;
 
 import java.util.List;
 
@@ -33,17 +30,41 @@ public final class MoveGenerator {
     private MoveGenerator() {
     }
 
+
     /**
-     * Every move {@code color} may legally play in the given position.
+     * Returns all moves that do not leave the specified
+     * color's king in check.
      *
-     * <p>At M4 this is {@link #pseudoLegalMoves} unfiltered: the right colour
-     * and the right geometry. M5 adds the one global rule, king safety, here
-     * and only here. {@code Game.legalMoves()} calls this and does not change
-     * when it tightens.
+     * The board is restored after evaluating each candidate.
+     *
+     * @param board the current chessboard
+     * @param color the side whose legal moves are requested
+     * @return a list of legal moves
      */
     public static List<Move> legalMoves(Board board, Color color) {
-        return pseudoLegalMoves(board, color);
+
+        List<Move> legal = new ArrayList<>();
+
+        for (Move move : pseudoLegalMoves(board, color)) {
+
+            board.apply(move);
+
+            boolean leavesKingInCheck;
+
+            try {
+                leavesKingInCheck = isInCheck(board, color);
+            } finally {
+                board.undo(move);
+            }
+
+            if (!leavesKingInCheck) {
+                legal.add(move);
+            }
+        }
+
+        return legal;
     }
+
 
     /**
      * Every geometrically possible move for {@code color}, king safety aside.
@@ -67,4 +88,50 @@ public final class MoveGenerator {
 
         return moves;
     }
+
+
+    /**
+     * Determines whether the target square is attacked by any
+     * piece belonging to the specified attacking color.
+     *
+     * @param board the chessboard to examine
+     * @param target the square being examined
+     * @param attacker the color of the attacking pieces
+     * @return true if the target is attacked; false otherwise
+     */
+    public static boolean isAttacked(
+            Board board, Position target, Color attacker) {
+
+        for (Position from : board.positionsOf(attacker)) {
+
+            Piece piece = board.pieceAt(from);
+
+            if (piece.attacks(board, from, target)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Determines whether the specified color's king
+     * is currently under attack.
+     *
+     * @param board the current chessboard
+     * @param color the color of the king to examine
+     * @return true if the king is in check; false otherwise
+     */
+    public static boolean isInCheck(Board board, Color color) {
+
+        Position king = board.kingPosition(color);
+
+        if (king == null) {
+            return false;
+        }
+
+        return isAttacked(board, king, color.opposite());
+    }
+
 }
