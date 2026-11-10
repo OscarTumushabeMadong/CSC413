@@ -134,4 +134,26 @@ public final class MoveGenerator {
         return isAttacked(board, king, color.opposite());
     }
 
+
+    /**
+     * Determines the current game status for the side to move.
+     *
+     * @param board the current chessboard
+     * @param sideToMove the player whose turn it is
+     * @return the current game status
+     */
+    public static GameStatus status(Board board, Color sideToMove) {
+
+        boolean inCheck = isInCheck(board, sideToMove);
+
+        boolean hasLegalMoves = !legalMoves(board, sideToMove).isEmpty();
+
+        if (hasLegalMoves) {
+            return inCheck ? GameStatus.CHECK : GameStatus.IN_PROGRESS;
+        }
+
+        return inCheck ? GameStatus.CHECKMATE : GameStatus.STALEMATE;
+    }
+
+
 }

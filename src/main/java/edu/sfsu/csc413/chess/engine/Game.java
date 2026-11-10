@@ -129,4 +129,26 @@ public class Game {
 
         return Optional.of(last);
     }
+
+
+
+    /**
+     * Returns the current status of this game.
+     *
+     * @return the current game status
+     */
+    public GameStatus status() {
+        return MoveGenerator.status(board, sideToMove);
+    }
+
+    /**
+     * Determines whether this game has ended.
+     *
+     * @return true if the game has ended
+     */
+    public boolean isGameOver() {
+        return status().isGameOver();
+    }
+
+
 }

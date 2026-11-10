@@ -1,36 +1,31 @@
+
 package edu.sfsu.csc413.chess;
 
 import edu.sfsu.csc413.chess.engine.Game;
-import edu.sfsu.csc413.chess.view.PieceGlyphs;
-import edu.sfsu.csc413.chess.view.TextBoardRenderer;
+import edu.sfsu.csc413.chess.view.BoardView;
+import edu.sfsu.csc413.chess.view.ConsoleView;
+import edu.sfsu.csc413.chess.view.EmojiView;
+import edu.sfsu.csc413.chess.view.GameController;
 
-import java.util.List;
-
+/**
+ * Entry point for the interactive chess game.
+ */
 public class Main {
 
     public static void main(String[] args) {
 
         Game game = new Game();
-        TextBoardRenderer renderer =
-                new TextBoardRenderer(PieceGlyphs.LETTERS);
 
-        // Starting board
-        System.out.println(renderer.render(game.board()));
+        BoardView view;
 
-        // Play e2e4 and e7e5
-        for (String notation : List.of("e2e4", "e7e5")) {
-            game.play(
-                    game.findLegalMove(notation).orElseThrow()
-            );
+        if (args.length > 0 && args[0].equalsIgnoreCase("emoji")) {
+            view = new EmojiView();
+        } else {
+            view = new ConsoleView();
         }
 
-        // Board after both moves
-        System.out.println(renderer.render(game.board()));
+        GameController controller = new GameController(game, view);
 
-        // Undo Black's e7e5
-        game.undoLastMove();
-
-        // Board after undo
-        System.out.println(renderer.render(game.board()));
+        controller.start();
     }
 }
