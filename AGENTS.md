@@ -61,6 +61,8 @@ of these files, stop and report the problem.
 ## SwingView Requirements
 - Display an 8x8 board with readable chess pieces.
 - Allow selecting a piece and clicking its destination.
+  Display board coordinates (a-h and 1-8) around the chessboard
+  while keeping the interface responsive.
 - Show the current turn and game-status messages.
 - Display illegal-move feedback.
 - Provide an Undo button using PlayerAction.Undo().
