@@ -62,7 +62,9 @@ of these files, stop and report the problem.
 - Display an 8x8 board with high-contrast chess pieces
   that remain clearly distinguishable on both light
   and dark squares.
-- Allow selecting a piece and clicking its destination.
+- Allow selecting a piece and clicking its destination,
+  with a visible selection highlight and clearly marked
+  legal destination squares obtained from game.legalMoves().
 - Show the current turn and game-status messages.
 - Display illegal-move feedback.
 - Provide an Undo button using PlayerAction.Undo().
