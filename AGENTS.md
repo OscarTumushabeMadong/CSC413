@@ -59,7 +59,9 @@ of these files, stop and report the problem.
   inside the corresponding view.
 
 ## SwingView Requirements
-- Display an 8x8 board with readable chess pieces.
+- Display an 8x8 board with high-contrast chess pieces
+  that remain clearly distinguishable on both light
+  and dark squares.
 - Allow selecting a piece and clicking its destination.
 - Show the current turn and game-status messages.
 - Display illegal-move feedback.
